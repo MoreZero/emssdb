@@ -162,7 +162,7 @@ func (db *DB) hsetOne(name, key, val Bytes) (ret Status) {
 
 func (db *DB) hinitsetOne(name, key, val Bytes) (ret Status) {
 	writer := db.writer
-	if dbval, hgerr := db.Hget(name, key); hgerr != nil {
+	if _, hgerr := db.Hget(name, key); hgerr != nil {
 		hkey := encodeHashKey(name, key)
 		writer.Put(hkey, val)
 		return StatSucChange
