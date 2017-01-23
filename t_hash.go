@@ -65,7 +65,7 @@ func (db *DB) Hdel(name, key Bytes) (err error) {
 
 func (db *DB) Hinitset(name, key, val Bytes) (err error) {
 	if verr := isVaildHashKey(name, key); verr != nil {
-		return false, verr
+		return verr
 	}
 	writer := db.writer
 	writer.Do()
@@ -73,7 +73,7 @@ func (db *DB) Hinitset(name, key, val Bytes) (err error) {
 	// readoption
 	if st := db.hinitsetOne(name, key, val); st == StatSucChange {
 		if err := db.hincrSize(name, 1); err != nil {
-			return false, err
+			return err
 		}
 	} else {
 		return st
