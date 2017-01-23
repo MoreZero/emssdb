@@ -63,6 +63,24 @@ func (db *DB) Hdel(name, key Bytes) (err error) {
 	return writer.Commit()
 }
 
+func (db *DB) Hinitset(name, key, val Bytes) (err error) {
+	if verr := isVaildHashKey(name, key); verr != nil {
+		return false, verr
+	}
+	writer := db.writer
+	writer.Do()
+	defer writer.Done()
+	// readoption
+	if st := db.hinitsetOne(name, key, val); st == StatSucChange {
+		if err := db.hincrSize(name, 1); err != nil {
+			return false, err
+		}
+	} else {
+		return st
+	}
+	return writer.Commit()
+}
+
 func (db *DB) Hincr(name, key Bytes, by int64) (newval int64, err error) {
 	if verr := isVaildHashKey(name, key); verr != nil {
 		return 0, verr
@@ -142,6 +160,16 @@ func (db *DB) hsetOne(name, key, val Bytes) (ret Status) {
 	}
 }
 
+func (db *DB) hinitsetOne(name, key, val Bytes) (ret Status) {
+	writer := db.writer
+	if dbval, hgerr := db.Hget(name, key); hgerr != nil {
+		hkey := encodeHashKey(name, key)
+		writer.Put(hkey, val)
+		return StatSucChange
+	} else {
+		return StatExist
+	}
+}
 func (db *DB) hdelOne(name, key Bytes) (ret Status) {
 	if len(key) == 0 || len(name) == 0 {
 		return ErrEmptyKey

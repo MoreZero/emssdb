@@ -31,6 +31,7 @@ var (
 	ErrLongKey    = errors.New("ssdb: key too long")
 	StatSuccess   = errors.New("")
 	StatSucChange = errors.New("ssdb: change size")
+	StatExist = errors.New("ssdb: key alrealy exist")
 	StatNotFound  = errors.New("ssdb: no item")
 	ErrOptFail    = errors.New("ssdb: operate fail")
 	ErrNotIntVal  = errors.New("ssdb: not intager val")
